@@ -1,6 +1,6 @@
-streamlit
 ccxt
 pandas
 numpy
 ta
+streamlit
 matplotlib

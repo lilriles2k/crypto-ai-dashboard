@@ -39,7 +39,24 @@ def basic_moving_average_strategy(df):
     df = df.copy()
     df['SMA20'] = df['close'].rolling(window=20).mean()
     df['SMA50'] = df['close'].rolling(window=50).mean()
-    df['signal'] = np.where(df['SMA20'] > df['SMA50'], 'BUY', 'SELL')
+    df['signal'] = 'HOLD'
+
+    for i in range(1, len(df)):
+        if (
+            df['SMA20'].iloc[i] > df['SMA50'].iloc[i]
+            and df['rsi'].iloc[i] < 30
+            and df['macd'].iloc[i] > df['macd_signal'].iloc[i]
+        ):
+            df.at[i, 'signal'] = 'BUY'
+        elif (
+            df['SMA20'].iloc[i] < df['SMA50'].iloc[i]
+            and df['rsi'].iloc[i] > 70
+            and df['macd'].iloc[i] < df['macd_signal'].iloc[i]
+        ):
+            df.at[i, 'signal'] = 'SELL'
+        else:
+            df.at[i, 'signal'] = 'HOLD'
+
     df['action'] = df['signal'].shift(1).fillna("HOLD")
     return df[['timestamp', 'close', 'SMA20', 'SMA50', 'signal', 'action', 'rsi', 'macd', 'macd_signal', 'bb_upper', 'bb_lower']]
 
